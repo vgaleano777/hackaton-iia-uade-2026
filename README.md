@@ -90,14 +90,20 @@ Qué cambiamos: Se diseñaron las reglas de decisión priorizando los días de h
 
 ## 5. ¿Comparado contra qué?
 
-**Línea base trivial.** <Qué resultado saca un sistema que responde siempre lo mismo, y cómo se compara el suyo.>
+**Línea base trivial.**
+Si utilizáramos una línea base basada en el dato que mira la gerencia ("Despachado a tiempo del depósito"):
+Predecir que todo lo que sale a tiempo NO llegará tarde:
+En el dataset de entrenamiento (14 casos), 9 salieron a tiempo del depósito. De esos 9, 4 llegaron tarde igual (casos 6, 8, 9 y 12) por efecto mariposa en las escalas y puertos.
+La exactitud de esa regla simple sería de solo 10 / 14 = 71.4% y dejaría pasar 4 Falsos Negativos graves.
+Nuestro sistema (100% de exactitud y 0% FN) demuestra que mirar solo el inicio de la cadena no alcanza para prever demoras internacionales.
+
 
 | Checklist (Clase 6) | Respuesta |
 |---|---|
-| ¿Qué datos? | <> |
-| ¿Qué métrica? | <> |
-| ¿Comparado contra qué? | <> |
-| ¿Quién lo midió? | <> |
+| ¿Qué datos? | 20 envíos internacionales del dataset M12 con 4 características por envío.|
+| ¿Qué métrica? | Sensibilidad (para capturar demoras) y Exactitud global. |
+| ¿Comparado contra qué? | Contra el indicador gerencial simple ("Despachado a tiempo del depósito") |
+| ¿Quién lo midió? | El área de Operaciones utilizó la división entre 14 casos de entrenamiento y 6 de prueba. |
 
 ## 6. Riesgo: el camino completo
 
