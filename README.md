@@ -3,7 +3,7 @@
 **Integrantes:** Valentin Galeano · Emanuel Xie
 **IA declarada:** Gemini
 **Pista:** Reglas
-**Publicación en LinkedIn:** <link>
+**Publicación en LinkedIn:** https://www.linkedin.com/in/valentin-galeano-183064321/
 
 ---
 
@@ -142,3 +142,4 @@ Riesgo concreto: Que un puerto declare un índice de congestión bajo (ej. 2), p
 |---|---|---|---|
 | 1 | 7 | Operadores no definidos explícitamente; inconsistencia en matriz de entrenamiento (casos 4 y 14); falta de cuantificación del descenso de FN; comparación basada en el indicador de gerencia y no en la línea base trivial; "Quién lo midió" sin responder y bitácora incompleta.| Explicitamos los operadores (mayor o igual, menor o igual, igual) y el orden estricto de reglas; recalculamos la matriz caso por caso (Caso 4 = VN, Caso 14 = FP); documentamos la reducción de FN de 3 a 1; incorporamos la línea base trivial del 50%; respondimos la verificación de medición |
 |2| 7 | Inconsistencia en los valores de los casos 2, 3 y 8 respecto al dataset original; conteo de matriz de entrenamiento incorrecto; cálculo de ventaja contra la línea base distorsionado (+21.4%); número de descenso de FN mal afirmado (3 a 1); justificación vaga en el rechazo a la regresión.|Corregimos las filas de los casos 2, 3 y 8 con los valores reales del dataset; recalculamos la matriz de entrenamiento exacta (VP=5, FN=2, FP=3, VN=4); ajustamos la exactitud a 64.3% (+14.3% sobre la línea base); corregimos el descenso de FN a 3 a 2 en entrenamiento; y reescribimos el rechazo de modelos complejos fundándolo en la exigencia de reglas declarativas.|
+|3| 9 |Cuando el envío sale del depósito, ¿de dónde sale el índice de congestión del puerto de transbordo? Si todavía no existe ese dato al decidir, ¿qué le pasa a la regla 2?|Nada|
