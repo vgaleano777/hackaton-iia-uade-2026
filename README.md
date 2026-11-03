@@ -106,8 +106,12 @@ Nuestro sistema (100% de exactitud y 0% FN) demuestra que mirar solo el inicio d
 | ¿Quién lo midió? | El área de Operaciones utilizó la división entre 14 casos de entrenamiento y 6 de prueba. |
 
 ## 6. Riesgo: el camino completo
+Flujo: Registro de congestión desactualizado --> Regla clasifica envío como NO tardío --> Operaciones no reserva flete urgente de respaldo -->El transbordo se pierde-->Penalización contractual y pérdida del cliente.
 
-<Datos → modelo → decisión → consecuencia aplicado a su caso. Al menos un riesgo concreto.>
+Riesgo concreto: Que un puerto declare un índice de congestión bajo (ej. 2), pero ocurre una huelga sorpresiva durante el tránsito del buque. La holgura baja (ej. 3 días) no será suficiente para absorber el imprevisto. El modelo habrá devuelto un NO (Falso Negativo), impidiendo actuar preventivamente y desatando el reclamo de penalidad contractual por parte del cliente final.
+
+
+
 
 ## 7. Bitácora
 
