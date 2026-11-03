@@ -1,4 +1,4 @@
-# <> · ¿Este envió internacional llega tarde?
+# M12 · ¿Este envió internacional llega tarde?
 
 **Integrantes:** Valentin Galeano · Emanuel Xie
 **IA declarada:** Gemini
@@ -9,16 +9,23 @@
 
 ## 1. Formulación y PEAS
 
-**La pregunta.** <Para cada caso, ¿…? SÍ significa: …>
-
-| PEAS | Su sistema |
+**La pregunta.** Para cada envió internacional, ¿llegara tarde al cliente final? 
+SÍ significa: El envió sufre demoras encadenadas (efecto mariposa) y sobrepasa la fecha prometida de entrega al cliente final
+NO significa: El envió llega a tiempo o absorbe los pequeños imprevistos dentro de sus días de holgura
+| PEAS | Clasificador de reglas logicas para alertas operativas de envios internacionales |
 |---|---|
-| Medida de rendimiento | <cómo se sabe si decidió bien> |
-| Entorno | <dónde y con qué decide> |
-| Actuadores | <qué hace con la decisión> |
-| Sensores | <qué datos recibe> |
+| Medida de rendimiento | Minimización de falsos negativos (evitar penalizaciones por clientes no avisados) manteniendo un equilibrio con los Falsos Positivos (evitar gastos necesarios de flete urgente |
+| Entorno | Sistema de gestión de envíos internacionales (ERP/TMS), tracking de puertos globales y registros de depósito |
+| Actuadores | Alerta al área de Operaciones para contratar fletes urgentes o reconfigurar la ruta de transbordo |
+| Sensores | Datos de reserva de carga, número de escalas, índice de congestión portuaria en origen/transbordo y marcas de tiempo de salida del depósito |
 
-**Objetivo y métrica.** <Qué es lo que de verdad importa en su problema y con qué métrica lo van a medir. ¿Son lo mismo?>
+**Objetivo y métrica.** 
+Lo que importa: Predecir si las pequeñas demoras (como escalas o congestión portuaria) se amplificarán y causarán un retraso final, evitando penalizaciones por reclamos de clientes
+
+Métrica principal: Sensibilidad (Recall), para minimizar Falsos Negativos
+
+¿Son lo mismo?: No. La métrica que usa la gerencia (% de envíos despachados a tiempo del depósito) mide solo el inicio, mientras que la métrica de nuestro sistema evalúa si el envío llega tarde al final de toda la cadena internacional. Un paquete puede salir a tiempo del depósito (dato de gerencia = 1) y de todas formas llegar tarde por el efecto mariposa de la congestión y transbordos (resultado real = 1).
+
 
 ## 2. El sistema
 
