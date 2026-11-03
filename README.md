@@ -52,8 +52,8 @@ Despachado a tiempo del depósito (0/1): Indica si el envío ya arranca con retr
 **Dos casos de ejemplo.**
 | Caso inventado | Valores | Salida del sistema |
 |---|---|---|
-| Caso A | Escalas: 4 | Holgura: 3 | Congestión: 6 | Despachado a tiempo: 0 | SÍ |
-| B | Escalas: 1 | Holgura: 9 | Congestión: 4 | Despachado a tiempo: 1  | NO |
+| Caso A | Escalas: 4, Holgura: 3, Congestión: 6, Despachado a tiempo: 0 | SÍ |
+| Caso B | Escalas: 1, Holgura: 9, Congestión: 4, Despachado a tiempo: 1 | NO |
 
 ## 3. Medición
 
