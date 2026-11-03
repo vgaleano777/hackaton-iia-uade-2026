@@ -2,7 +2,7 @@
 
 **Integrantes:** Valentin Galeano · Emanuel Xie
 **IA declarada:** Gemini
-**Pista:** <Neurona / Reglas / Agente>
+**Pista:** Reglas
 **Publicación en LinkedIn:** <link>
 
 ---
@@ -119,7 +119,7 @@ Riesgo concreto: Que un puerto declare un índice de congestión bajo (ej. 2), p
 
 | # | Qué le pedimos | Qué aceptamos | Qué rechazamos y por qué |
 |---|---|---|---|
-| 1 | <> | <> | <> |
+| 1 | Analizar el dataset de los datos y realizar las consignas del hackaton | Su primer respuesta inicial | Rechazamos su propuesta inicial de realizar una regresion logistica compleja porque con reglas logicas claras se lograba un 100% de efectividad |
 
 **Corridas contra el evaluador**
 
