@@ -29,18 +29,31 @@ Métrica principal: Sensibilidad (Recall), para minimizar Falsos Negativos
 
 ## 2. El sistema
 
-**Cómo decide.** <Neurona: pesos y sesgo. Reglas: la lista de reglas si‑entonces. Agente: la regla con la que elige la acción.>
+**Cómo decide.** Reglas: Definimos una regla basada en la interacción de las variables de congestión y escalas frente a los días de holgura:
+REGLA 1: Si Despachado a tiempo del depósito = 0 Y Días de holgura 7, entonces SÍ.
+REGLA 2: Si Escalas 3 Y Congestión portuaria 5 Y Días de holgura 7, entonces SÍ.
+REGLA 3: Si Congestión portuaria 8 Y Días de holgura 4, entonces SÍ.
+REGLA 4: En cualquier otro caso, la Salida es NO.
 
-**Variables que usa y por qué.** <Cuáles usa, cuáles descarta y por qué.>
 
-**Cómo se corre en vivo.** <Pasos concretos para resolver un caso nuevo: link al Colab, a la planilla o la cuenta a mano.>
+**Variables que usa y por qué.** 
+Escalas (transbordos): Cada escala añade un punto de falla donde pequeños retrasos se acumulan (efecto mariposa).
+Días de holgura: El "colchón" del envío para absorber imprevistos.
+Congestión portuaria (0 a 10): Multiplicador de demoras en la ruta.
+Despachado a tiempo del depósito (0/1): Indica si el envío ya arranca con retraso desde el origen.
+
+
+**Cómo se corre en vivo.** 
+1. Para un nuevo envío se revisan los 4 atributos.
+2. Se evalúan las Reglas 1, 2 y 3 en orden.
+3. Si el envío cumple cualquiera de los criterios de riesgo combinados con baja holgura, el sistema devuelve SÍ (llegará tarde). De lo contrario, emite NO.
+
 
 **Dos casos de ejemplo.**
-
 | Caso inventado | Valores | Salida del sistema |
 |---|---|---|
-| A | <…> | <SÍ/NO> |
-| B | <…> | <SÍ/NO> |
+| Caso A | Escalas: 4 | Holgura: 3 | Congestión: 6 | Despachado a tiempo: 0 | SÍ |
+| B | Escalas: 1 | Holgura: 9 | Congestión: 4 | Despachado a tiempo: 1  | NO |
 
 ## 3. Medición
 
