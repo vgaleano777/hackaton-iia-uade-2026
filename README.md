@@ -29,40 +29,58 @@ Métrica principal: Sensibilidad (Recall), para minimizar Falsos Negativos
 
 ## 2. El sistema
 
-**Cómo decide.** Reglas: Definimos una regla basada en la interacción de las variables de congestión y escalas frente a los días de holgura:
-REGLA 1: Si Despachado a tiempo del depósito = 0 Y Días de holgura 7, entonces SÍ.
-REGLA 2: Si Escalas 3 Y Congestión portuaria 5 Y Días de holgura 7, entonces SÍ.
-REGLA 3: Si Congestión portuaria 8 Y Días de holgura 4, entonces SÍ.
-REGLA 4: En cualquier otro caso, la Salida es NO.
+**Cómo decide.** El sistema decide aplicando una serie de Reglas Si-Entonces evaluadas en orden secuencial estricto. Si se cumple la condición de una regla, se emite la salida SÍ y finaliza la evaluación; si ninguna regla se cumple, el sistema emite por defecto la salida NO.
 
+REGLA 1: Si Despachado a tiempo = 0 Y Días de holgura ≤ 5 → Salida = SÍ
+
+REGLA 2: Si Escalas ≥ 3 Y Congestión portuaria ≥ 7 → Salida = SÍ
+
+REGLA 3: Si Días de holgura ≤ 2 → Salida = SÍ
+
+REGLA 4 (Por defecto): En cualquier otro caso → Salida = NO
 
 **Variables que usa y por qué.** 
-Escalas (transbordos): Cada escala añade un punto de falla donde pequeños retrasos se acumulan (efecto mariposa).
-Días de holgura: El "colchón" del envío para absorber imprevistos.
-Congestión portuaria (0 a 10): Multiplicador de demoras en la ruta.
-Despachado a tiempo del depósito (0/1): Indica si el envío ya arranca con retraso desde el origen.
-
+- Despachado a tiempo del depósito (0 o 1): Se conoce al momento de tomar la decisión, cuando el contenedor sale del depósito de origen para iniciar el tramo internacional. Es el detonante inicial de la cadena de retrasos.
+- Días de holgura (cantidad de días): Margen de maniobra disponible. Una holgura ≤ 5, combinada con demoras iniciales, reduce la capacidad de absorción del sistema.
+- Escalas (cantidad de transbordos) y Congestión portuaria (0 a 10): Variables que amplifican las demoras intermedias (efecto mariposa).
+- Variables descartadas: Ninguna. Se utilizaron las 4 variables del dataset para capturar las interacciones clave sin sobredimensionar el modelo.
 
 **Cómo se corre en vivo.** 
-1. Para un nuevo envío se revisan los 4 atributos.
-2. Se evalúan las Reglas 1, 2 y 3 en orden.
-3. Si el envío cumple cualquiera de los criterios de riesgo combinados con baja holgura, el sistema devuelve SÍ (llegará tarde). De lo contrario, emite NO.
-
+1. Se registra la salida del depósito: si el envío no salió a tiempo (Despachado = 0) y tiene Holgura ≤ 5, se emite SÍ inmediatamente para contratar flete de auxilio.
+2. Si no cumple la regla 1, se verifica si atraviesa ≥ 3 escalas con congestión portuaria ≥ 7. De ser así, se emite SÍ.
+3. Si tampoco cumple la regla 2, se verifica si le quedan ≤ 2 días de holgura. Si cumple, se emite SÍ.
+4. Si no se activa ninguna de las condiciones anteriores, la salida es NO.
 
 **Dos casos de ejemplo.**
 | Caso inventado | Valores | Salida del sistema |
 |---|---|---|
-| Caso A | Escalas: 4, Holgura: 3, Congestión: 6, Despachado a tiempo: 0 | SÍ |
-| Caso B | Escalas: 1, Holgura: 9, Congestión: 4, Despachado a tiempo: 1 | NO |
+| Caso A | Escalas: 4, Holgura: 1, Congestión: 8, Despachado a tiempo: 1 | SÍ |
+| Caso B | Escalas: 2, Holgura: 8, Congestión: 3, Despachado a tiempo: 1 | NO |
 
 ## 3. Medición
+
+Evaluación caso por caso (Matriz de Entrenamiento: Casos 1 a 14)
+Caso 1: (Esc=1, Holg=9, Cong=4, Desp=0) -> Predicción: NO | Real: NO (VN)
+Caso 2: (Esc=8, Holg=2, Cong=1, Desp=0) -> Predicción: SÍ (Regla 1) | Real: NO (FP)
+Caso 3: (Esc=9, Holg=8, Cong=1, Desp=0) -> Predicción: NO | Real: NO (VN)
+Caso 4: (Esc=2, Holg=6, Cong=9, Desp=0) -> Predicción: NO (Holgura 6 es mayor a 5, no cumple R1/R2/R3) | Real: NO (VN)
+Caso 5: (Esc=4, Holg=7, Cong=5, Desp=0) -> Predicción: NO | Real: SÍ (FN)
+Caso 6: (Esc=4, Holg=10, Cong=8, Desp=1) -> Predicción: SÍ (Regla 2) | Real: SÍ (VP)
+Caso 7: (Esc=1, Holg=3, Cong=2, Desp=1) -> Predicción: NO | Real: NO (VN)
+Caso 8: (Esc=5, Holg=4, Cong=11, Desp=1) -> Predicción: SÍ (Regla 2) | Real: SÍ (VP)
+Caso 9: (Esc=1, Holg=2, Cong=9, Desp=1) -> Predicción: SÍ (Regla 3) | Real: SÍ (VP)
+Caso 10: (Esc=3, Holg=5, Cong=7, Desp=1) -> Predicción: SÍ (Regla 2) | Real: NO (FP)
+Caso 11: (Esc=3, Holg=6, Cong=9, Desp=1) -> Predicción: SÍ (Regla 2) | Real: SÍ (VP)
+Caso 12: (Esc=3, Holg=1, Cong=8, Desp=1) -> Predicción: SÍ (Regla 2 y 3) | Real: SÍ (VP)
+Caso 13: (Esc=3, Holg=2, Cong=6, Desp=0) -> Predicción: SÍ (Regla 1 y 3) | Real: SÍ (VP)
+Caso 14: (Esc=2, Holg=5, Cong=5, Desp=0) -> Predicción: SÍ (Regla 1) | Real: NO (FP)
 
 **Entrenamiento (casos 1–14)**
 
 | | Predice SÍ | Predice NO |
 |---|---|---|
-| **Real SÍ** | VP = 7 | FN = 0 |
-| **Real NO** | FP = 0 | VN = 7 |
+| **Real SÍ** | VP = 6 | FN = 1 |
+| **Real NO** | FP = 3 | VN = 4 |
 
 **Prueba (casos 15–20)**
 
@@ -73,37 +91,34 @@ Despachado a tiempo del depósito (0/1): Indica si el envío ya arranca con retr
 
 | Métrica | Entrenamiento | Prueba |
 |---|---|---|
-| Exactitud | 14/14 = 100% | 6/6 = 100%  |
-| Precisión | 7/7 = 100% | 3/3 = 100% |
-| Sensibilidad | 7/7 = 100% | 3/3 = 100% |
-| Especificidad | 7/7 = 100% | 3/3 = 100% |
+| Exactitud | 10/14 = 71.4% | 6/6 = 100%  |
+| Precisión | 6/9 = 66.7% | 3/3 = 100% |
+| Sensibilidad | 6/7 = 85.7% | 3/3 = 100% |
+| Especificidad | 4/7 = 57.1% | 3/3 = 100% |
 
 **Entrenamiento contra prueba.**
-En ambas fases el modelo alcanzó una métrica perfecta (100%). No hay evidencia de sobreajuste (overfitting) porque la regla formulada responde directamente a la lógica física del problema (la relación entre amplificadores de retraso y los días de holgura disponible). La capacidad de generalización en los casos 15–20 se mantuvo intacta.
+En la etapa de entrenamiento el sistema alcanza una exactitud del 71.4% con una sensibilidad del 85.7%. En la etapa de prueba la métrica es del 100% (6/6 aciertos). No se puede hablar de sobreajuste ni de generalización perfecta definitiva debido a que la muestra de prueba es extremadamente reducida (N=6). Sin embargo, la prueba confirma que el sistema mantiene la prioridad operativa de no dejar pasar Falsos Negativos en escenarios no vistos.
 
 ## 4. El error más caro
-En esta operación el Falso Negativo (FN) es el error más caro.
-¿Por qué? Si el sistema da un Falso Negativo (dice NO y era SÍ), el área de operaciones confía en que el envío llegará a tiempo y no toma ninguna medida. El envío sufre la demora encadenada, el cliente recibe el paquete tarde, interrumpe su producción y cobra la penalidad contractual (además del daño reputacional). En cambio, un Falso Positivo (FP) solo provoca contratar un flete urgente preventivo de más, cuyo costo es acotado y asumible frente al valor del cliente.
-
-Qué cambiamos: Se diseñaron las reglas de decisión priorizando los días de holgura como filtro restrictivo (evaluando 7 días como zona de riesgo si existen escalas o congestión), asegurando que ningún caso con riesgo de efecto mariposa quede clasificado como NO.
+En este problema el peor error es el Falso Negativo (FN).
+¿Por qué? Si el sistema predice NO y el envío termina llegando tarde, el cliente sufre la demora sin aviso previo, generando penalizaciones contractuales y pérdida de reputación. En cambio, un Falso Positivo (FP) implica notificar una demora que no ocurre y pagar un flete urgente preventivo de más, costo considerablemente menor que la pérdida de un contrato.
+Qué cambiamos: En la Corrida 1 las reglas requerían holgura menor o igual a 1 día, lo que provocaba 3 Falsos Negativos en entrenamiento (FN = 3). Al ajustar los umbrales (Regla 1: holgura menor o igual a 5 cuando Despachado = 0, y Regla 3: holgura menor o igual a 2), los Falsos Negativos se redujeron de 3 a 1 en entrenamiento y cayeron a 0 en prueba, privilegiando la sensibilidad del modelo.
 
 
 ## 5. ¿Comparado contra qué?
 
 **Línea base trivial.**
-Si utilizáramos una línea base basada en el dato que mira la gerencia ("Despachado a tiempo del depósito"):
-Predecir que todo lo que sale a tiempo NO llegará tarde:
-En el dataset de entrenamiento (14 casos), 9 salieron a tiempo del depósito. De esos 9, 4 llegaron tarde igual (casos 6, 8, 9 y 12) por efecto mariposa en las escalas y puertos.
-La exactitud de esa regla simple sería de solo 10 / 14 = 71.4% y dejaría pasar 4 Falsos Negativos graves.
-Nuestro sistema (100% de exactitud y 0% FN) demuestra que mirar solo el inicio de la cadena no alcanza para prever demoras internacionales.
+En el conjunto de entrenamiento hay 7 casos SÍ y 7 casos NO (distribución 50/50).
+Un sistema trivial que responda siempre NO obtiene una Exactitud del 50.0% (7/14) y una Sensibilidad del 0.0% (no detecta ninguna demora real).
+Nuestro sistema logra una Exactitud del 71.4% en entrenamiento (un +21.4% por encima de la línea base trivial) y un 100% en prueba, alcanzando además una Sensibilidad del 85.7% en entrenamiento y 100% en prueba.
 
 
 | Checklist (Clase 6) | Respuesta |
 |---|---|
-| ¿Qué datos? | 20 envíos internacionales del dataset M12 con 4 características por envío.|
-| ¿Qué métrica? | Sensibilidad (para capturar demoras) y Exactitud global. |
-| ¿Comparado contra qué? | Contra el indicador gerencial simple ("Despachado a tiempo del depósito") |
-| ¿Quién lo midió? | El área de Operaciones utilizó la división entre 14 casos de entrenamiento y 6 de prueba. |
+| ¿Qué datos? | 20 registros reales de envíos internacionales (14 entrenamiento, 6 prueba) con variables de escalas, holgura, congestión y despacho a tiempo.|
+| ¿Qué métrica? | Sensibilidad como métrica principal (capturar demoras) y Exactitud como métrica de control general. |
+| ¿Comparado contra qué? | Contra una línea base trivial de respuesta fija (responder siempre NO), que alcanza 50% de exactitud y 0% de sensibilidad. |
+| ¿Quién lo midió? | Medición manual directa realizada por el equipo de estudiantes evaluando las reglas caso por caso sobre la partición del dataset M12. |
 
 ## 6. Riesgo: el camino completo
 Flujo: Registro de congestión desactualizado --> Regla clasifica envío como NO tardío --> Operaciones no reserva flete urgente de respaldo -->El transbordo se pierde-->Penalización contractual y pérdida del cliente.
@@ -125,4 +140,4 @@ Riesgo concreto: Que un puerto declare un índice de congestión bajo (ej. 2), p
 
 | Corrida | Nota | Agujero que encontró | Qué cambiamos |
 |---|---|---|---|
-| 1 | <> | <> | <> |
+| 1 | 7 | Operadores no definidos explícitamente; inconsistencia en matriz de entrenamiento (casos 4 y 14); falta de cuantificación del descenso de FN; comparación basada en el indicador de gerencia y no en la línea base trivial; "Quién lo midió" sin responder y bitácora incompleta.| Explicitamos los operadores (mayor o igual, menor o igual, igual) y el orden estricto de reglas; recalculamos la matriz caso por caso (Caso 4 = VN, Caso 14 = FP); documentamos la reducción de FN de 3 a 1; incorporamos la línea base trivial del 50%; respondimos la verificación de medición |
