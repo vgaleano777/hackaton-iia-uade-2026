@@ -61,24 +61,25 @@ Despachado a tiempo del depósito (0/1): Indica si el envío ya arranca con retr
 
 | | Predice SÍ | Predice NO |
 |---|---|---|
-| **Real SÍ** | VP = <> | FN = <> |
-| **Real NO** | FP = <> | VN = <> |
+| **Real SÍ** | VP = 7 | FN = 0 |
+| **Real NO** | FP = 0 | VN = 7 |
 
 **Prueba (casos 15–20)**
 
 | | Predice SÍ | Predice NO |
 |---|---|---|
-| **Real SÍ** | VP = <> | FN = <> |
-| **Real NO** | FP = <> | VN = <> |
+| **Real SÍ** | VP = 3 | FN = 0 |
+| **Real NO** | FP = 0 | VN = 3 |
 
 | Métrica | Entrenamiento | Prueba |
 |---|---|---|
-| Exactitud | <> | <> |
-| Precisión | <> | <> |
-| Sensibilidad | <> | <> |
-| Especificidad | <> | <> |
+| Exactitud | 14/14 = 100% | 6/6 = 100%  |
+| Precisión | 7/7 = 100% | 3/3 = 100% |
+| Sensibilidad | 7/7 = 100% | 3/3 = 100% |
+| Especificidad | 7/7 = 100% | 3/3 = 100% |
 
-**Entrenamiento contra prueba.** <¿Hay diferencia? ¿Por qué? ¿Sobreajuste o generalización?>
+**Entrenamiento contra prueba.**
+En ambas fases el modelo alcanzó una métrica perfecta (100%). No hay evidencia de sobreajuste (overfitting) porque la regla formulada responde directamente a la lógica física del problema (la relación entre amplificadores de retraso y los días de holgura disponible). La capacidad de generalización en los casos 15–20 se mantuvo intacta.
 
 ## 4. El error más caro
 
