@@ -82,8 +82,11 @@ Despachado a tiempo del depósito (0/1): Indica si el envío ya arranca con retr
 En ambas fases el modelo alcanzó una métrica perfecta (100%). No hay evidencia de sobreajuste (overfitting) porque la regla formulada responde directamente a la lógica física del problema (la relación entre amplificadores de retraso y los días de holgura disponible). La capacidad de generalización en los casos 15–20 se mantuvo intacta.
 
 ## 4. El error más caro
+En esta operación el Falso Negativo (FN) es el error más caro.
+¿Por qué? Si el sistema da un Falso Negativo (dice NO y era SÍ), el área de operaciones confía en que el envío llegará a tiempo y no toma ninguna medida. El envío sufre la demora encadenada, el cliente recibe el paquete tarde, interrumpe su producción y cobra la penalidad contractual (además del daño reputacional). En cambio, un Falso Positivo (FP) solo provoca contratar un flete urgente preventivo de más, cuyo costo es acotado y asumible frente al valor del cliente.
 
-<¿Es peor el falso positivo o el falso negativo en su problema? ¿Por qué, según la ficha? ¿Qué cambiaron en el sistema para cometer menos ese error?>
+Qué cambiamos: Se diseñaron las reglas de decisión priorizando los días de holgura como filtro restrictivo (evaluando 7 días como zona de riesgo si existen escalas o congestión), asegurando que ningún caso con riesgo de efecto mariposa quede clasificado como NO.
+
 
 ## 5. ¿Comparado contra qué?
 
